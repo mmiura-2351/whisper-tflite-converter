@@ -6,7 +6,7 @@ import soundfile as sf
 from transformers import (
     WhisperProcessor,
     TFWhisperForConditionalGeneration,
-    WhisperForConditionalGeneration
+    WhisperForConditionalGeneration,
 )
 from datasets import load_dataset
 
@@ -38,7 +38,9 @@ class GenerateModel(tf.Module):
 
 def load_sample_audio():
     """Load sample audio data for testing."""
-    ds = load_dataset("hf-internal-testing/librispeech_asr_dummy", "clean", split="validation")
+    ds = load_dataset(
+        "hf-internal-testing/librispeech_asr_dummy", "clean", split="validation"
+    )
     return ds[0]["audio"]["array"]
 
 
@@ -68,7 +70,9 @@ def convert_to_tflite(model_name="openai/whisper-tiny", tflite_path=None):
 
         # Try to load TensorFlow model from PyTorch
         try:
-            model = TFWhisperForConditionalGeneration.from_pretrained(model_name, from_pt=True)
+            model = TFWhisperForConditionalGeneration.from_pretrained(
+                model_name, from_pt=True
+            )
         except OSError:
             # PyTorch model not found, load via PyTorch and convert
             print("PyTorch model not found, loading via PyTorch and converting...")
@@ -82,7 +86,9 @@ def convert_to_tflite(model_name="openai/whisper-tiny", tflite_path=None):
             pt_model.save_pretrained(temp_pt_dir)
 
             # Load TensorFlow model from saved PyTorch model
-            model = TFWhisperForConditionalGeneration.from_pretrained(temp_pt_dir, from_pt=True)
+            model = TFWhisperForConditionalGeneration.from_pretrained(
+                temp_pt_dir, from_pt=True
+            )
 
             # Clean up temporary PyTorch model
             shutil.rmtree(temp_pt_dir)
@@ -94,11 +100,13 @@ def convert_to_tflite(model_name="openai/whisper-tiny", tflite_path=None):
         # Save as SavedModel
         print(f"Saving SavedModel to {saved_model_dir}")
         # Apply input signature to serving function
-        concrete_function = generate_model.serving.get_concrete_function(*generate_model.input_signature)
+        concrete_function = generate_model.serving.get_concrete_function(
+            *generate_model.input_signature
+        )
         tf.saved_model.save(
             generate_model,
             saved_model_dir,
-            signatures={"serving_default": concrete_function}
+            signatures={"serving_default": concrete_function},
         )
 
         # Convert to TFLite
@@ -106,7 +114,7 @@ def convert_to_tflite(model_name="openai/whisper-tiny", tflite_path=None):
         converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_dir)
         converter.target_spec.supported_ops = [
             tf.lite.OpsSet.TFLITE_BUILTINS,
-            tf.lite.OpsSet.SELECT_TF_OPS
+            tf.lite.OpsSet.SELECT_TF_OPS,
         ]
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
         tflite_model = converter.convert()
@@ -156,7 +164,9 @@ def test_model(tflite_path, processor, audio_path=None):
 
         tflite_generate = interpreter.get_signature_runner()
         generated_ids = tflite_generate(input_features=input_features)["sequences"]
-        transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        transcription = processor.batch_decode(generated_ids, skip_special_tokens=True)[
+            0
+        ]
         print("TFLite model transcription:", transcription)
 
         return transcription
@@ -166,7 +176,9 @@ def test_model(tflite_path, processor, audio_path=None):
         raise
 
 
-def create_tflite_model(model_name="openai/whisper-tiny", tflite_path=None, audio_path=None, skip_test=False):
+def create_tflite_model(
+    model_name="openai/whisper-tiny", tflite_path=None, audio_path=None, skip_test=False
+):
     """Create and optionally test a TFLite model for Whisper speech recognition."""
 
     # Convert model to TFLite
@@ -181,24 +193,23 @@ def create_tflite_model(model_name="openai/whisper-tiny", tflite_path=None, audi
 
 def main():
     """Main function with command line argument support."""
-    parser = argparse.ArgumentParser(description="Convert Whisper model to TFLite format")
+    parser = argparse.ArgumentParser(
+        description="Convert Whisper model to TFLite format"
+    )
     parser.add_argument(
         "--model",
         default="openai/whisper-tiny",
-        help="Whisper model name (default: openai/whisper-tiny)"
+        help="Whisper model name (default: openai/whisper-tiny)",
     )
     parser.add_argument(
         "--output",
-        help="Output TFLite model path (default: models/{model_name}.tflite)"
+        help="Output TFLite model path (default: models/{model_name}.tflite)",
     )
     parser.add_argument(
-        "--audio",
-        help="Audio file path for validation (default: use sample audio)"
+        "--audio", help="Audio file path for validation (default: use sample audio)"
     )
     parser.add_argument(
-        "--skip-test",
-        action="store_true",
-        help="Skip model testing after conversion"
+        "--skip-test", action="store_true", help="Skip model testing after conversion"
     )
 
     args = parser.parse_args()
@@ -207,7 +218,7 @@ def main():
         model_name=args.model,
         tflite_path=args.output,
         audio_path=args.audio,
-        skip_test=args.skip_test
+        skip_test=args.skip_test,
     )
 
 
