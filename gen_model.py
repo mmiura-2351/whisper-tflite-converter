@@ -10,13 +10,17 @@ from transformers import (
 )
 from datasets import load_dataset
 
+# Default configuration
+DEFAULT_MAX_NEW_TOKENS = 223
+
 
 class GenerateModel(tf.Module):
     """Generation-enabled Whisper model for TFLite conversion."""
 
-    def __init__(self, model):
+    def __init__(self, model, max_new_tokens=DEFAULT_MAX_NEW_TOKENS):
         super(GenerateModel, self).__init__()
         self.model = model
+        self.max_new_tokens = max_new_tokens
         # Get n_mels from model config
         self.n_mels = model.config.num_mel_bins
 
@@ -30,7 +34,7 @@ class GenerateModel(tf.Module):
         """Serving function for text generation from audio features."""
         outputs = self.model.generate(
             input_features,
-            max_new_tokens=223,
+            max_new_tokens=self.max_new_tokens,
             return_dict_in_generate=True,
         )
         return {"sequences": outputs["sequences"]}
@@ -50,7 +54,11 @@ def load_audio_file(audio_path):
     return audio_data
 
 
-def convert_to_tflite(model_name="openai/whisper-tiny", tflite_path=None):
+def convert_to_tflite(
+    model_name="openai/whisper-tiny",
+    tflite_path=None,
+    max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
+):
     """Convert Whisper model to TFLite format."""
 
     try:
@@ -95,7 +103,7 @@ def convert_to_tflite(model_name="openai/whisper-tiny", tflite_path=None):
 
         # Create generation-enabled model
         print("Creating generation-enabled model...")
-        generate_model = GenerateModel(model=model)
+        generate_model = GenerateModel(model=model, max_new_tokens=max_new_tokens)
 
         # Save as SavedModel
         print(f"Saving SavedModel to {saved_model_dir}")
@@ -177,12 +185,16 @@ def test_model(tflite_path, processor, audio_path=None):
 
 
 def create_tflite_model(
-    model_name="openai/whisper-tiny", tflite_path=None, audio_path=None, skip_test=False
+    model_name="openai/whisper-tiny",
+    tflite_path=None,
+    audio_path=None,
+    skip_test=False,
+    max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
 ):
     """Create and optionally test a TFLite model for Whisper speech recognition."""
 
     # Convert model to TFLite
-    tflite_path, processor = convert_to_tflite(model_name, tflite_path)
+    tflite_path, processor = convert_to_tflite(model_name, tflite_path, max_new_tokens)
 
     # Test model if not skipped
     if not skip_test:
@@ -211,6 +223,12 @@ def main():
     parser.add_argument(
         "--skip-test", action="store_true", help="Skip model testing after conversion"
     )
+    parser.add_argument(
+        "--max-new-tokens",
+        type=int,
+        default=DEFAULT_MAX_NEW_TOKENS,
+        help=f"Maximum number of new tokens to generate (default: {DEFAULT_MAX_NEW_TOKENS})",
+    )
 
     args = parser.parse_args()
 
@@ -219,6 +237,7 @@ def main():
         tflite_path=args.output,
         audio_path=args.audio,
         skip_test=args.skip_test,
+        max_new_tokens=args.max_new_tokens,
     )
 
 
