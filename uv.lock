@@ -1879,43 +1879,6 @@ wheels = [
 ]
 
 [[package]]
-name = "tflite-converter"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "datasets" },
-    { name = "soundfile" },
-    { name = "tensorflow" },
-    { name = "tf-keras" },
-    { name = "torch" },
-    { name = "torchaudio" },
-    { name = "torchcodec" },
-    { name = "torchvision" },
-    { name = "transformers" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "datasets", specifier = ">=4.1.1" },
-    { name = "soundfile", specifier = ">=0.13.1" },
-    { name = "tensorflow", specifier = "==2.14.1" },
-    { name = "tf-keras", specifier = ">=2.15.0" },
-    { name = "torch", specifier = ">=2.8.0" },
-    { name = "torchaudio", specifier = ">=2.8.0" },
-    { name = "torchcodec", specifier = ">=0.7.0" },
-    { name = "torchvision", specifier = ">=0.23.0" },
-    { name = "transformers", specifier = ">=4.56.2" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "ruff", specifier = ">=0.13.1" }]
-
-[[package]]
 name = "tokenizers"
 version = "0.22.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2168,6 +2131,43 @@ sdist = { url = "https://files.pythonhosted.org/packages/8a/98/2d9906746cdc6a6ef
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/2c/87f3254fd8ffd29e4c02732eee68a83a1d3c346ae39bc6822dcbcb697f2b/wheel-0.45.1-py3-none-any.whl", hash = "sha256:708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248", size = 72494, upload-time = "2024-11-23T00:18:21.207Z" },
 ]
+
+[[package]]
+name = "whisper-tflite-converter"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "datasets" },
+    { name = "soundfile" },
+    { name = "tensorflow" },
+    { name = "tf-keras" },
+    { name = "torch" },
+    { name = "torchaudio" },
+    { name = "torchcodec" },
+    { name = "torchvision" },
+    { name = "transformers" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = ">=4.1.1" },
+    { name = "soundfile", specifier = ">=0.13.1" },
+    { name = "tensorflow", specifier = "==2.14.1" },
+    { name = "tf-keras", specifier = ">=2.15.0" },
+    { name = "torch", specifier = ">=2.8.0" },
+    { name = "torchaudio", specifier = ">=2.8.0" },
+    { name = "torchcodec", specifier = ">=0.7.0" },
+    { name = "torchvision", specifier = ">=0.23.0" },
+    { name = "transformers", specifier = ">=4.56.2" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.13.1" }]
 
 [[package]]
 name = "wrapt"

@@ -1,7 +1,7 @@
 [project]
-name = "tflite-converter"
+name = "whisper-tflite-converter"
 version = "0.1.0"
-description = "Add your description here"
+description = "A tool to convert Whisper models from Hugging Face Transformers to TensorFlow Lite format"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
